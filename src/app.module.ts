@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from './auth/auth.module';
+import { GoogleAuthModule } from './auth/google/google-auth.module';
+import { LocalAuthModule } from './auth/local/local-auth.module';
 import { UserModule } from './user/user.module';
 
 
@@ -10,7 +11,8 @@ import { UserModule } from './user/user.module';
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URI),
     UserModule,
-    AuthModule
+    GoogleAuthModule,
+    LocalAuthModule
   ],
   controllers: [],
   providers: [],

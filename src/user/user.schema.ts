@@ -25,7 +25,7 @@ export class User {
     @Prop({ default: false })
     isVerified: boolean
 
-    @Prop({})
+    @Prop({ default: "https://vk.com/images/camera_200.png" })
     avatar: string
 
     @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: "User" }] })
@@ -36,6 +36,9 @@ export class User {
 
     @Prop()
     birthDate: string
+
+    @Prop()
+    password: string
 }
 
 
