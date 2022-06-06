@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
+import { Post } from "src/posts/post.schema";
 
 export enum GenderEnum {
     male = 'male',
@@ -29,7 +30,10 @@ export class User {
     avatar: string
 
     @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: "User" }] })
-    followers: User[]
+    followers: Types.ObjectId[]
+
+    @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: "User" }] })
+    follows: Types.ObjectId[]
 
     @Prop({ enum: GenderEnum })
     gender: string
@@ -39,6 +43,12 @@ export class User {
 
     @Prop()
     password: string
+
+    @Prop({ type: [{ type: Types.ObjectId, ref: "Post" }] })
+    posts: Post[]
+
+    @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: "User" }] })
+    likes: User[]
 }
 
 

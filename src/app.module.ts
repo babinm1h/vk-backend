@@ -3,6 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GoogleAuthModule } from './auth/google/google-auth.module';
 import { LocalAuthModule } from './auth/local/local-auth.module';
+import { CommentsModule } from './comments/comments.module';
+import { MessageModule } from './messages/messages.module';
+import { PostsModule } from './posts/posts.module';
 import { UserModule } from './user/user.module';
 
 
@@ -12,7 +15,10 @@ import { UserModule } from './user/user.module';
     MongooseModule.forRoot(process.env.MONGO_URI),
     UserModule,
     GoogleAuthModule,
-    LocalAuthModule
+    LocalAuthModule,
+    PostsModule,
+    CommentsModule,
+    MessageModule
   ],
   controllers: [],
   providers: [],

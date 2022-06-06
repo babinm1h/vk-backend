@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
+import { CommentSchema, Comment } from "src/comments/comment.schema";
 import { UserModule } from "src/user/user.module";
 import { User, UserSchema } from "src/user/user.schema";
 import { UserService } from "src/user/user.service";
@@ -14,6 +15,7 @@ import { LocalStrategy } from "./strategies/LocalStrategy";
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+        MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
         PassportModule,
         UserModule,
         JwtModule.register({

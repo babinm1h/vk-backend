@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, UnauthorizedException, } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException, } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
+import { CommentDocument, Comment } from "src/comments/comment.schema";
 import { EditUserDto } from "./dto/editUser.dto";
 import { User, UserDocument } from "./user.schema";
 
@@ -9,7 +10,11 @@ import { User, UserDocument } from "./user.schema";
 
 export class UserService {
 
-    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
+    constructor(
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
+        @InjectModel(Comment.name) private CommentModel: Model<CommentDocument>,
+    ) { }
+
 
     async getById(id: Types.ObjectId) {
         const user = await this.userModel.findById(id)
@@ -18,8 +23,15 @@ export class UserService {
     }
 
 
+    async getProfile(id: Types.ObjectId) {
+        let profile = await this.userModel.findById(id).populate('posts followers')
+        return profile
+    }
+
+
     async editUser(id: Types.ObjectId, dto: EditUserDto) {
         const user = await this.userModel.findById(id)
+        if (!user) throw new BadRequestException()
 
         user.name = dto.name
         user.gender = dto.gender
@@ -30,5 +42,31 @@ export class UserService {
         return await user.save()
     }
 
+
+    async toggleFollow(authUserId: Types.ObjectId, followUserId: Types.ObjectId) {
+        const authUser = await this.getById(authUserId)
+        const followUser = await this.getById(followUserId)
+
+        if (authUser.follows.includes(followUserId)) {
+            authUser.follows = authUser.follows.filter(id => String(id) !== String(followUserId))
+            followUser.followers = followUser.followers.filter(id => String(id) !== String(authUserId))
+        } else {
+            authUser.follows = [...authUser.follows, followUserId]
+            followUser.followers = [...followUser.followers, authUserId]
+        }
+
+        await authUser.save()
+        await followUser.save()
+
+        return true
+    }
+
+
+    async searchUser(searchQuery: string) {
+        const result = await this.userModel.find({ name: new RegExp(searchQuery, 'i') })
+            .sort({ createdAt: 'desc' }).select("-password -__v")
+
+        return result
+    }
 
 }
