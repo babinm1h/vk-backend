@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Request, Delete, Param } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Request, Delete, Param, Get } from "@nestjs/common";
 import { Types } from "mongoose";
 import { JwtGuard } from "src/auth/local/guards/JwtGuard";
 import { CommentsService } from "./comments.service";
@@ -19,8 +19,18 @@ export class CommentsController {
 
     @UseGuards(JwtGuard)
     @Delete('/:id')
-    delete(@Param("id", IdValidationPipe) id: Types.ObjectId, @Body("postId") postId, @Request() req) {
-        return this.commentsService.delete({ commentId: id, postId }, req.user._id)
+    delete(@Param("id", IdValidationPipe) commentId: Types.ObjectId, @Body("postId") postId, @Request() req) {
+        return this.commentsService.delete({ commentId, postId }, req.user._id)
+    }
+
+    @Get('/:id')
+    getByPost(@Param('id', IdValidationPipe) postId: Types.ObjectId) {
+        return this.commentsService.getFirstByPost(postId)
+    }
+
+    @Get('/all/:id')
+    getAllByPost(@Param('id', IdValidationPipe) postId: Types.ObjectId) {
+        return this.commentsService.getAllByPost(postId)
     }
 }
 

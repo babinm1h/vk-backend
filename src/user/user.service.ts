@@ -35,7 +35,7 @@ export class UserService {
 
         user.name = dto.name
         user.gender = dto.gender
-        user.avatar = dto.avatar
+        user.avatar = dto.avatar.length > 0 ? dto.avatar : "https://vk.com/images/camera_200.png"
         user.city = dto.city
         user.birthDate = dto.birthDate
 

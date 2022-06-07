@@ -13,13 +13,10 @@ export class Post {
     text: string
 
     @Prop()
-    images: string[]
+    image: string
 
     @Prop({ type: Types.ObjectId, ref: "User", required: true })
     user: User
-
-    @Prop({ type: [{ type: Types.ObjectId, ref: "Comment" }] })
-    comments: Comment
 
     @Prop({ type: [{ type: Types.ObjectId, ref: "User" }] })
     likes: Types.ObjectId[]
@@ -27,8 +24,6 @@ export class Post {
     @Prop({ default: 0, min: 0 })
     likesCount: number
 
-    @Prop({ default: 0, min: 0 })
-    commentsCount: number
 }
 
 

@@ -1,8 +1,10 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
+import { CloudinaryService } from "src/cloudinary/cloudinary.service";
 import { Comment, CommentDocument } from "src/comments/comment.schema";
 import { User, UserDocument } from "src/user/user.schema";
+import { CreatePostDto } from "./dtos/createPost.dto";
 import { Post, PostDocument, PostSchema } from "./post.schema";
 
 
@@ -13,24 +15,39 @@ export class PostService {
     constructor(
         @InjectModel(Post.name) private postModel: Model<PostDocument>,
         @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
-        @InjectModel(User.name) private userModel: Model<UserDocument>
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
+        private cloudinaryService: CloudinaryService
     ) { }
 
     async getAll() {
-        let posts = await this.postModel.find().sort({ createdAt: `desc` }).populate("user comments") as any
-        posts = await this.commentModel.populate(posts, { path: "comments.user" })
+        const posts = await this.postModel.find().sort({ createdAt: `desc` }).populate("user")
         return posts
     }
 
-    async create(userId: Types.ObjectId, text: string) {
-        const post = await this.postModel.create({ user: userId, text })
-        await post.populate("user comments")
+    async getById(postId: Types.ObjectId) {
+        let post = await this.postModel.findById(postId).populate("user")
+        return post
+    }
+
+    async create(userId: Types.ObjectId, { text, file }: CreatePostDto) {
+        let post;
+
+        if (file) {
+            const image = await this.cloudinaryService.uploadImage(file)
+            console.log(image, "ffa");
+            post = await this.postModel.create({ user: userId, text, image })
+        } else {
+            post = await this.postModel.create({ user: userId, text })
+        }
+
+        await post.populate("user", "name avatar ")
         await this.userModel.findByIdAndUpdate(userId, { $push: { posts: post._id } })
         return post
     }
 
     async delete(id: Types.ObjectId, userId: Types.ObjectId) {
         const post = await this.postModel.findByIdAndDelete(id)
+        await this.commentModel.deleteMany({ post: id })
         await this.userModel.findByIdAndUpdate(userId, { $pull: { posts: post._id } })
         return post
     }
@@ -38,27 +55,16 @@ export class PostService {
 
     async like(userId: Types.ObjectId, postId: Types.ObjectId) {
         const post = await this.postModel.findById(postId)
-        if (post.likes.includes(userId)) return 'already liked'
+        if (post.likes.includes(userId)) {
+            post.likes = post.likes.filter(id => String(id) !== String(userId))
+            post.likesCount -= 1
+        } else {
+            post.likes.push(userId)
+            post.likesCount += 1
+        }
 
-        post.likes.push(userId)
-        post.likesCount += 1
         await post.save()
-
         return post._id
     }
 
-
-    async unlike(userId: Types.ObjectId, postId: Types.ObjectId) {
-        const post = await this.postModel.findById(postId) as any
-        if (!post.likes.includes(userId)) return 'not liked'
-
-        await post.updateOne({
-            $pull: { likes: userId },
-            $inc: { likesCount: -1 }
-        }, { new: true })
-
-        await post.save()
-
-        return post._id
-    }
 }

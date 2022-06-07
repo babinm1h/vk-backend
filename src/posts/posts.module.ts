@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { CloudinaryService } from "src/cloudinary/cloudinary.service";
 import { CommentSchema, Comment } from "src/comments/comment.schema";
 import { User, UserSchema } from "src/user/user.schema";
 import { PostSchema, Post } from "./post.schema";
@@ -15,7 +16,7 @@ import { PostService } from "./posts.service";
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     ],
 
-    providers: [PostService],
+    providers: [PostService, CloudinaryService],
     controllers: [PostsController]
 })
 

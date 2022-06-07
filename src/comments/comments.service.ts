@@ -16,22 +16,29 @@ export class CommentsService {
 
 
     async create({ post, text }: CreateCommentDto, user: Types.ObjectId) {
-        const comm = await this.commentModel.create({ post, user, text })
-        await this.postModel.findByIdAndUpdate(post, {
-            $push: { comments: comm._id },
-            $inc: { commentsCount: 1 }
-        })
-        return comm
+        return await this.commentModel.create({ post, user, text })
     }
 
 
     async delete({ postId, commentId }: DeleteCommentDto, user: Types.ObjectId) {
         await this.commentModel.findByIdAndDelete(commentId)
-        await this.postModel.findByIdAndUpdate(postId, {
-            $pull: { comments: commentId },
-            $inc: { commentsCount: -1 }
-        })
-
         return commentId
+    }
+
+
+    async getFirstByPost(postId: Types.ObjectId) {
+        const firstComments = await this.commentModel.find({ post: postId })
+            .populate("user", 'name avatar').limit(2)
+
+        const commsCount = await this.commentModel.find({ post: postId }).count()
+
+        return { count: commsCount, firstComments }
+    }
+
+
+    async getAllByPost(postId: Types.ObjectId) {
+        const comments = await this.commentModel.find({ post: postId }).populate("user", 'name avatar')
+
+        return { count: comments.length, comments }
     }
 }
