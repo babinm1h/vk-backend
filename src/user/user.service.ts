@@ -90,4 +90,9 @@ export class UserService {
         return result
     }
 
+
+    async changeStatus(userId: Types.ObjectId, status: string) {
+        return await this.userModel.findByIdAndUpdate(userId, { $set: { status } })
+    }
+
 }

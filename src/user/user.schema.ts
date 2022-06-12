@@ -43,6 +43,9 @@ export class User {
     @Prop()
     password: string
 
+    @Prop()
+    status: string
+
     @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: "User" }] })
     likes: User[]
 }

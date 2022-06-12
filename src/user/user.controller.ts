@@ -43,4 +43,10 @@ export class UserController {
     async toggleFollow(@Param('id', IdValidationPipe) followUserId: Types.ObjectId, @Request() req) {
         return this.userService.toggleFollow(req.user._id, followUserId)
     }
+
+    @UseGuards(JwtGuard)
+    @Post('/change/status')
+    async changeStatus(@Request() req, @Body("status") status: string) {
+        return this.userService.changeStatus(req.user._id, status)
+    }
 }
