@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Dialog, DialogDocument } from "src/dialogs/dialog.schema";
@@ -15,19 +15,28 @@ export class MessagesService {
     ) { }
 
 
-    async create({ text, userTo, dialogId }: CreateMessageDto, userFrom: Types.ObjectId) {
-        const msg = await this.messageModel.create({ userFrom: userFrom, text, userTo })
+    async create({ text, senderId, dialogId }: CreateMessageDto) {
+        const msg = await this.messageModel.create({ sender: senderId, text, dialog: dialogId })
 
         const dialog = await this.dialogModel.findById(dialogId)
         if (!dialog) throw new NotFoundException("Диалог не найден")
+        dialog.latestMessage = msg;
+        dialog.messages.push(new Types.ObjectId(msg._id))
+        await dialog.save()
 
-        dialog.messages = [...dialog.messages, msg._id]
-        return await dialog.save()
+        return msg
     }
 
 
-    async delete(messageId: Types.ObjectId) {
+    async delete(messageId: Types.ObjectId, dialogId: Types.ObjectId) {
         const msg = await this.messageModel.findByIdAndDelete(messageId)
+        if (!msg) throw new NotFoundException("сообщение не найдено")
+
+        const dialog = await this.dialogModel.findById(dialogId).populate("messages")
+        dialog.latestMessage = dialog.messages.slice(-1)[0] as any
+
+        await dialog.save()
+
         return msg
     }
 

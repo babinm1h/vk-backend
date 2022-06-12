@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, Put, Query, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, Patch, Post, Put, Query, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { Types } from "mongoose";
 import { IdValidationPipe } from "pipes/id.validation.pipe";
 import { JwtGuard } from "src/auth/local/guards/JwtGuard";
@@ -24,9 +25,10 @@ export class UserController {
 
 
     @UseGuards(JwtGuard)
+    @UseInterceptors(FileInterceptor('avatar'))
     @Put("/edit")
-    async editUser(@Body() dto: EditUserDto, @Request() req) {
-        return this.userService.editUser(req.user._id, dto)
+    async editUser(@Body() dto: EditUserDto, @Request() req, @UploadedFile() avatar) {
+        return this.userService.editUser(req.user._id, { ...dto, avatar })
     }
 
 

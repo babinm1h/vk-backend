@@ -1,10 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document, Types } from "mongoose";
-import { Post } from "src/posts/post.schema";
 
 export enum GenderEnum {
-    male = 'male',
-    female = 'female'
+    male = 'Мужчина',
+    female = 'Женщина'
 }
 
 
@@ -21,7 +20,7 @@ export class User {
     name: string
 
     @Prop({})
-    city: string
+    country: string
 
     @Prop({ default: false })
     isVerified: boolean
@@ -43,9 +42,6 @@ export class User {
 
     @Prop()
     password: string
-
-    @Prop({ type: [{ type: Types.ObjectId, ref: "Post" }] })
-    posts: Post[]
 
     @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: "User" }] })
     likes: User[]

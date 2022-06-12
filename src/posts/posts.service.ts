@@ -34,7 +34,6 @@ export class PostService {
 
         if (file) {
             const image = await this.cloudinaryService.uploadImage(file)
-            console.log(image, "ffa");
             post = await this.postModel.create({ user: userId, text, image })
         } else {
             post = await this.postModel.create({ user: userId, text })
@@ -67,4 +66,20 @@ export class PostService {
         return post._id
     }
 
+
+    async searchPosts(searchQuery: string) {
+        const result = await this.postModel.find({ text: new RegExp(searchQuery, 'i') })
+            .sort({ createdAt: 'desc' }).populate('user', "avatar name")
+
+        return result
+    }
+
+
+    async getByUser(userId: Types.ObjectId) {
+        const objectId = new Types.ObjectId(userId)
+        const posts = await this.postModel.find({ user: objectId }).populate("user", 'name avatar')
+            .sort({ createdAt: 'desc' })
+
+        return posts
+    }
 }

@@ -13,15 +13,15 @@ export class MessagesController {
 
     @UseGuards(JwtGuard)
     @Post('/')
-    create(@Body() dto: CreateMessageDto, @Request() req) {
-        return this.messagesService.create(dto, req.user._id)
+    create(@Body('text') text: string, @Body('dialogId') dialogId: Types.ObjectId, @Request() req) {
+        return this.messagesService.create({ senderId: req.user._id, dialogId, text })
     }
 
 
     @UseGuards(JwtGuard)
     @Delete('/:id')
     delete(@Param('id', IdValidationPipe) id: Types.ObjectId) {
-        return this.messagesService.delete(id)
+        
     }
 
 

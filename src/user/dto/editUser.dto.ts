@@ -7,10 +7,9 @@ export class EditUserDto {
     name: string
 
     @IsString()
-    city: string
+    country: string
 
-    @IsString()
-    avatar: string
+    avatar: Express.Multer.File
 
     @IsString()
     birthDate: string

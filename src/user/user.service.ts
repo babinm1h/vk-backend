@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException, } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
+import { CloudinaryService } from "src/cloudinary/cloudinary.service";
 import { CommentDocument, Comment } from "src/comments/comment.schema";
 import { EditUserDto } from "./dto/editUser.dto";
 import { User, UserDocument } from "./user.schema";
@@ -13,6 +14,7 @@ export class UserService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
         @InjectModel(Comment.name) private CommentModel: Model<CommentDocument>,
+        private cloudinaryService: CloudinaryService
     ) { }
 
 
@@ -24,8 +26,24 @@ export class UserService {
 
 
     async getProfile(id: Types.ObjectId) {
-        let profile = await this.userModel.findById(id).populate('posts followers')
-        return profile
+        let profile = await this.userModel.findById(id).populate({
+            path: 'followers',
+            options: {
+                limit: 6,
+                sort: { createdAt: "desc" },
+                select: "name avatar"
+            }
+        })
+            .populate({
+                path: 'follows',
+                options: {
+                    limit: 6,
+                    sort: { createdAt: "desc" },
+                    select: "name avatar"
+                }
+            })
+
+        return profile;
     }
 
 
@@ -35,9 +53,12 @@ export class UserService {
 
         user.name = dto.name
         user.gender = dto.gender
-        user.avatar = dto.avatar.length > 0 ? dto.avatar : "https://vk.com/images/camera_200.png"
-        user.city = dto.city
+        user.country = dto.country
         user.birthDate = dto.birthDate
+        if (dto.avatar) {
+            const avatarUrl = await this.cloudinaryService.uploadImage(dto.avatar)
+            user.avatar = avatarUrl as string
+        }
 
         return await user.save()
     }

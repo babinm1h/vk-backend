@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Types } from "mongoose";
 import { IdValidationPipe } from "pipes/id.validation.pipe";
@@ -52,4 +52,15 @@ export class PostsController {
         return this.postsService.like(req.user._id, postId)
     }
 
+
+    @Get("/search")
+    searchPosts(@Query("searchQuery") searchQuery: string) {
+        return this.postsService.searchPosts(searchQuery)
+    }
+
+
+    @Get("/for/profile/:id")
+    getByUser(@Param("id") userId: Types.ObjectId) {
+        return this.postsService.getByUser(userId)
+    }
 }

@@ -11,8 +11,14 @@ export type DialogDocument = Document & Dialog
 @Schema({ timestamps: true })
 export class Dialog {
 
-    @Prop({ type: [{ type: Types.ObjectId, ref: "Message" }] })
-    messages: Message[]
+    @Prop({ type: [{ type: Types.ObjectId, ref: "Message" }], default: [] })
+    messages: Types.ObjectId[]
+
+    @Prop({ type: [{ type: Types.ObjectId, ref: "User" }] })
+    users: Types.ObjectId[]
+
+    @Prop({ type: Types.ObjectId, ref: "Message" })
+    latestMessage: Message
 }
 
 

@@ -2,6 +2,6 @@ import { Types } from "mongoose"
 
 export class CreateMessageDto {
     readonly text: string
-    readonly userTo: Types.ObjectId
-    dialogId: Types.ObjectId
+    readonly senderId: Types.ObjectId
+    readonly dialogId: Types.ObjectId
 }

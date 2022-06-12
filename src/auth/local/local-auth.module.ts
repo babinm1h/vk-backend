@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
+import { CloudinaryService } from "src/cloudinary/cloudinary.service";
 import { CommentSchema, Comment } from "src/comments/comment.schema";
 import { UserModule } from "src/user/user.module";
 import { User, UserSchema } from "src/user/user.schema";
@@ -24,7 +25,7 @@ import { LocalStrategy } from "./strategies/LocalStrategy";
         })
     ],
 
-    providers: [LocalAuthService, LocalStrategy, JwtStrategy, UserService],
+    providers: [LocalAuthService, LocalStrategy, JwtStrategy, UserService, CloudinaryService],
     controllers: [LocalAuthController]
 })
 
