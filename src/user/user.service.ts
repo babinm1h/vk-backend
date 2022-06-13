@@ -95,4 +95,16 @@ export class UserService {
         return await this.userModel.findByIdAndUpdate(userId, { $set: { status } })
     }
 
+
+    async getFollowers(userId: Types.ObjectId) {
+        return await this.userModel.find({ follows: { $in: [userId] } }).select('avatar name')
+    }
+
+
+    async searchFollowers(searchQuery: string, userId: Types.ObjectId) {
+        return await this.userModel.find({
+            follows: { $in: [userId] },
+            name: new RegExp(searchQuery, 'i')
+        }).select('avatar name')
+    }
 }

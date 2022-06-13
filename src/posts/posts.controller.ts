@@ -14,8 +14,9 @@ export class PostsController {
     constructor(private postsService: PostService) { }
 
     @Get('/')
-    getAll() {
-        return this.postsService.getAll()
+    getAll(@Query('page') page: number) {
+        page = page || 1
+        return this.postsService.getAll(+page)
     }
 
     @Get('/byid/:id')

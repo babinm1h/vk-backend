@@ -49,4 +49,18 @@ export class UserController {
     async changeStatus(@Request() req, @Body("status") status: string) {
         return this.userService.changeStatus(req.user._id, status)
     }
+
+
+    @UseGuards(JwtGuard)
+    @Get("/my/followers")
+    async getUserFollowers(@Request() req) {
+        return this.userService.getFollowers(req.user._id)
+    }
+
+
+    @UseGuards(JwtGuard)
+    @Get("/my/followers/search")
+    async searchFollowers(@Request() req, @Query("searchQuery") searchQuery: string) {
+        return this.userService.searchFollowers(searchQuery, req.user._id)
+    }
 }

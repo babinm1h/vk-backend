@@ -19,15 +19,28 @@ export class PostService {
         private cloudinaryService: CloudinaryService
     ) { }
 
-    async getAll() {
+    async getAll(page: number, limit = 3) {
         const posts = await this.postModel.find().sort({ createdAt: `desc` }).populate("user")
-        return posts
+            .skip((page * limit) - limit).limit(limit)
+
+        const totalCount = await this.postModel.find().count()
+
+        let hasMore;
+        if (posts.length * page < totalCount) {
+            hasMore = true
+        } else {
+            hasMore = false
+        }
+
+        return { posts, totalCount, hasMore, page }
     }
+
 
     async getById(postId: Types.ObjectId) {
         let post = await this.postModel.findById(postId).populate("user")
         return post
     }
+
 
     async create(userId: Types.ObjectId, { text, file }: CreatePostDto) {
         let post;
@@ -43,6 +56,7 @@ export class PostService {
         await this.userModel.findByIdAndUpdate(userId, { $push: { posts: post._id } })
         return post
     }
+
 
     async delete(id: Types.ObjectId, userId: Types.ObjectId) {
         const post = await this.postModel.findByIdAndDelete(id)
@@ -82,4 +96,5 @@ export class PostService {
 
         return posts
     }
+
 }
