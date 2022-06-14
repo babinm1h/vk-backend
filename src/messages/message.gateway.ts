@@ -6,7 +6,7 @@ import { CreateMessageDto } from "./dtos/createMessage.dto";
 import { MessagesService } from "./messages.service";
 
 
-@WebSocketGateway(+process.env.PORT || 7777, { cors: true })
+@WebSocketGateway(+process.env.PORT || 80, { cors: true })
 export class MessageGateway {
 
     constructor(
