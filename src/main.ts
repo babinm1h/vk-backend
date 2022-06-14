@@ -10,7 +10,6 @@ async function bootstrap() {
     origin: 'https://vk-frontend-six.vercel.app',
     credentials: true
   })
-  app.setGlobalPrefix("api")
   app.use(session({
     secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false
   }))
