@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bodyParser: true });
   const PORT = process.env.PORT || 7777
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://vk-frontend-six.vercel.app/'],
+    origin: 'https://vk-frontend-six.vercel.app',
     credentials: true
   })
   app.setGlobalPrefix("api")
