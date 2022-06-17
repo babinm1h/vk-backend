@@ -35,14 +35,14 @@ export class LocalAuthService {
         const user = await this.userModel.create({ email, password: hashed, name })
 
         const payload = { id: user._id }
-        const token = this.jwtService.sign(payload)
+        const token = this.jwtService.sign(payload, { expiresIn: '30d' })
         return { token, user }
     }
 
 
     async login(user: any) {
         const payload = { id: user._id }
-        const token = this.jwtService.sign(payload)
+        const token = this.jwtService.sign(payload, { expiresIn: '30d' })
         return { user, token }
     }
 }
